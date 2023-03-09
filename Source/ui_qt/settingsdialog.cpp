@@ -31,6 +31,9 @@ SettingsDialog::SettingsDialog(QWidget* parent)
 	ui->comboBox_vulkan_device->blockSignals(true);
 
 	ui->comboBox_gs_selection->insertItem(SettingsDialog::GS_HANDLERS::OPENGL, "OpenGL");
+#ifdef HAS_GSH_METAL
+    ui->comboBox_gs_selection->insertItem(SettingsDialog::GS_HANDLERS::METAL, "Metal");
+#endif
 #ifdef HAS_GSH_VULKAN
 	auto devices = GSH_Vulkan::CDeviceInfo::GetInstance().GetAvailableDevices();
 	if(!devices.empty())
@@ -52,6 +55,7 @@ SettingsDialog::SettingsDialog(QWidget* parent)
 #else
 	ui->button_vulkanDeviceInfo->hide();
 #endif
+
 	if(ui->comboBox_gs_selection->count() <= 1)
 	{
 		ui->gs_option_widget->hide();

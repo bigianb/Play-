@@ -52,6 +52,9 @@ private:
 	enum GS_HANDLERS
 	{
 		OPENGL,
+#ifdef HAS_GSH_METAL
+        METAL,
+#endif
 #if HAS_GSH_VULKAN
 		VULKAN,
 #endif

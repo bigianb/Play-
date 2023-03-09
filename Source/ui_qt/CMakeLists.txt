@@ -55,6 +55,26 @@ if(USE_GSH_VULKAN)
 	)
 endif()
 
+if(TARGET_PLATFORM_MACOS)
+	if(NOT TARGET gsh_metal)
+		add_subdirectory(
+			${CMAKE_CURRENT_SOURCE_DIR}/../gs/GSH_Metal
+			${CMAKE_CURRENT_BINARY_DIR}/gs/GSH_Metal
+		)
+	endif()
+	list(INSERT PROJECT_LIBS 0 gsh_metal)
+	list(APPEND DEFINITIONS_LIST HAS_GSH_METAL=1)
+	set(GSH_METAL_QT_SRC
+		GSH_MetalQt.cpp
+		GSH_MetalQt.h
+		metalwindow.cpp
+		metalwindow.h
+	)
+     set(GSH_METAL_QT_MOC
+        metalwindow.h
+    )
+endif()
+
 if(TARGET_PLATFORM_UNIX)
 	find_package(LIBEVDEV REQUIRED)
 	list(APPEND PROJECT_LIBS ${LIBEVDEV_LIBRARY})
@@ -137,6 +157,7 @@ set(QT_SOURCES
 	VfsDevice.cpp
 	VfsDevice.h
 	${GSH_VULKAN_QT_SRC}
+	${GSH_METAL_QT_SRC}
 )
 if(ENABLE_AMAZON_S3)
 	set(QT_SOURCES
@@ -224,6 +245,7 @@ set(QT_MOC_HEADERS
 	vfsdiscselectordialog.h
 	${AMAZON_S3_QT_MOC}
 	${GSH_VULKAN_QT_MOC}
+    ${GSH_METAL_QT_MOC}
 )
 
 set(QT_UIS

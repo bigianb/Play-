@@ -19,6 +19,11 @@
 #include "gs/GSH_Vulkan/GSH_VulkanDeviceInfo.h"
 #endif
 
+#ifdef HAS_GSH_METAL
+#include "metalwindow.h"
+#include "GSH_MetalQt.h"
+#endif
+
 #include <ctime>
 
 #include <QDateTime>
@@ -222,8 +227,19 @@ void MainWindow::SetupGsHandler()
 		m_virtualMachine->CreateGSHandler(CGSH_VulkanQt::GetFactoryFunction(m_outputwindow));
 	}
 	break;
-	case SettingsDialog::GS_HANDLERS::OPENGL:
 #endif
+#ifdef HAS_GSH_METAL
+	case SettingsDialog::GS_HANDLERS::METAL:
+	{
+		m_outputwindow = new MetalWindow;
+		QWidget* container = QWidget::createWindowContainer(m_outputwindow);
+		m_outputwindow->create();
+		ui->stackedWidget->addWidget(container);
+		m_virtualMachine->CreateGSHandler(CGSH_MetalQt::GetFactoryFunction(m_outputwindow));
+	}
+	break;
+#endif
+	case SettingsDialog::GS_HANDLERS::OPENGL:
 	default:
 	{
 		m_outputwindow = new OpenGLWindow;
@@ -501,26 +517,26 @@ void MainWindow::CreateStatusBar()
 	statusBar()->addWidget(m_msgLabel, 1);
 	statusBar()->addWidget(m_fpsLabel);
 	statusBar()->addWidget(m_cpuUsageLabel);
-#ifdef HAS_GSH_VULKAN
-	if(GSH_Vulkan::CDeviceInfo::GetInstance().HasAvailableDevices())
-	{
-		m_gsLabel = new QLabel("");
-		auto gs_index = CAppConfig::GetInstance().GetPreferenceInteger(PREF_VIDEO_GS_HANDLER);
-		UpdateGSHandlerLabel(gs_index);
+    
+#if defined (HAS_GSH_VULKAN) || defined (HAS_GSH_METAL)
 
-		m_gsLabel->setAlignment(Qt::AlignHCenter);
-		m_gsLabel->setMinimumSize(m_gsLabel->sizeHint());
-		//QLabel have no click event, so we're using ContextMenu event aka rightClick to toggle GS
-		m_gsLabel->setContextMenuPolicy(Qt::CustomContextMenu);
-		connect(m_gsLabel, &QLabel::customContextMenuRequested, [&]() {
-			auto gs_index = CAppConfig::GetInstance().GetPreferenceInteger(PREF_VIDEO_GS_HANDLER);
-			gs_index = (gs_index + 1) % SettingsDialog::GS_HANDLERS::MAX_HANDLER;
-			CAppConfig::GetInstance().SetPreferenceInteger(PREF_VIDEO_GS_HANDLER, gs_index);
-			SetupGsHandler();
-			UpdateGSHandlerLabel(gs_index);
-		});
-		statusBar()->addWidget(m_gsLabel);
-	}
+    m_gsLabel = new QLabel("");
+    auto gs_index = CAppConfig::GetInstance().GetPreferenceInteger(PREF_VIDEO_GS_HANDLER);
+    UpdateGSHandlerLabel(gs_index);
+
+    m_gsLabel->setAlignment(Qt::AlignHCenter);
+    m_gsLabel->setMinimumSize(m_gsLabel->sizeHint());
+    //QLabel have no click event, so we're using ContextMenu event aka rightClick to toggle GS
+    m_gsLabel->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_gsLabel, &QLabel::customContextMenuRequested, [&]() {
+        auto gs_index = CAppConfig::GetInstance().GetPreferenceInteger(PREF_VIDEO_GS_HANDLER);
+        gs_index = (gs_index + 1) % SettingsDialog::GS_HANDLERS::MAX_HANDLER;
+        CAppConfig::GetInstance().SetPreferenceInteger(PREF_VIDEO_GS_HANDLER, gs_index);
+        SetupGsHandler();
+        UpdateGSHandlerLabel(gs_index);
+    });
+    statusBar()->addWidget(m_gsLabel);
+	
 #endif
 	m_msgLabel->setText(QString("Play! v%1 - %2").arg(PLAY_VERSION).arg(__DATE__));
 
@@ -1070,7 +1086,7 @@ void MainWindow::on_actionList_Bootables_triggered()
 
 void MainWindow::UpdateGSHandlerLabel(int gs_index)
 {
-#if HAS_GSH_VULKAN
+#if defined(HAS_GSH_VULKAN) || defined(HAS_GSH_METAL)
 	switch(gs_index)
 	{
 	default:
@@ -1080,6 +1096,9 @@ void MainWindow::UpdateGSHandlerLabel(int gs_index)
 	case SettingsDialog::GS_HANDLERS::VULKAN:
 		m_gsLabel->setText("Vulkan");
 		break;
+    case SettingsDialog::GS_HANDLERS::METAL:
+        m_gsLabel->setText("Metal");
+        break;
 	}
 #endif
 }

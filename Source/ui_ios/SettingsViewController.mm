@@ -82,7 +82,7 @@
 {
 	if([identifier isEqualToString:@"showGsHandlerSelector"])
 	{
-#ifdef HAS_GSH_VULKAN
+#ifdef HAS_GSH_VULKAN || HAS_GSH_METAL
 		return self.allowGsHandlerSelection;
 #else
 		return FALSE;
