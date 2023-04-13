@@ -18,6 +18,7 @@ public:
 	enum GS_HANDLERS
 	{
 		OPENGL,
+        SOFTWARE,
 #ifdef HAS_GSH_METAL
         METAL,
 #endif

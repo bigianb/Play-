@@ -24,6 +24,9 @@
 #include "GSH_MetalQt.h"
 #endif
 
+#include "softwarewindow.h"
+#include "GSH_SoftwareQt.h"
+
 #include <ctime>
 
 #include <QDateTime>
@@ -239,6 +242,15 @@ void MainWindow::SetupGsHandler()
 	}
 	break;
 #endif
+    case SettingsDialog::GS_HANDLERS::SOFTWARE:
+    {
+        m_outputwindow = new SoftwareWindow;
+        QWidget* container = QWidget::createWindowContainer(m_outputwindow);
+        m_outputwindow->create();
+        ui->stackedWidget->addWidget(container);
+        m_virtualMachine->CreateGSHandler(CGSH_SoftwareQt::GetFactoryFunction(m_outputwindow));
+    }
+    break;
 	case SettingsDialog::GS_HANDLERS::OPENGL:
 	default:
 	{
@@ -518,8 +530,6 @@ void MainWindow::CreateStatusBar()
 	statusBar()->addWidget(m_fpsLabel);
 	statusBar()->addWidget(m_cpuUsageLabel);
     
-#if defined (HAS_GSH_VULKAN) || defined (HAS_GSH_METAL)
-
     m_gsLabel = new QLabel("");
     auto gs_index = CAppConfig::GetInstance().GetPreferenceInteger(PREF_VIDEO_GS_HANDLER);
     UpdateGSHandlerLabel(gs_index);
@@ -537,7 +547,6 @@ void MainWindow::CreateStatusBar()
     });
     statusBar()->addWidget(m_gsLabel);
 	
-#endif
 	m_msgLabel->setText(QString("Play! v%1 - %2").arg(PLAY_VERSION).arg(__DATE__));
 
 	m_fpsTimer = new QTimer(this);
@@ -1086,16 +1095,21 @@ void MainWindow::on_actionList_Bootables_triggered()
 
 void MainWindow::UpdateGSHandlerLabel(int gs_index)
 {
-#if defined(HAS_GSH_VULKAN) || defined(HAS_GSH_METAL)
 	switch(gs_index)
 	{
 	default:
 	case SettingsDialog::GS_HANDLERS::OPENGL:
 		m_gsLabel->setText("OpenGL");
 		break;
+    case SettingsDialog::GS_HANDLERS::SOFTWARE:
+        m_gsLabel->setText("Software");
+        break;
+#if defined(HAS_GSH_VULKAN)
 	case SettingsDialog::GS_HANDLERS::VULKAN:
 		m_gsLabel->setText("Vulkan");
 		break;
+#endif
+#if defined(HAS_GSH_METAL)
     case SettingsDialog::GS_HANDLERS::METAL:
         m_gsLabel->setText("Metal");
         break;

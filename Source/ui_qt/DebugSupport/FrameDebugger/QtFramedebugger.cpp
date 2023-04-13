@@ -129,6 +129,11 @@ void QtFramedebugger::CreateGsHandler()
 	default:
 		assert(false);
 		[[fallthrough]];
+    case GS_HANDLERS::SOFTWARE:
+#ifdef HAS_GSH_METAL
+    case GS_HANDLERS::METAL:
+#endif
+            [[fallthrough]];
 	case GS_HANDLERS::OPENGL:
 	{
 		m_offscreenSurface = new QOffscreenSurface(nullptr);
@@ -142,6 +147,7 @@ void QtFramedebugger::CreateGsHandler()
 		m_gs = std::make_unique<CGSH_VulkanOffscreen>();
 		break;
 #endif
+
 	}
 	m_gs->SetLoggingEnabled(false);
 	m_gs->Initialize();

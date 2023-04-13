@@ -106,7 +106,7 @@ if(NOT TARGET ui_shared)
 	)
 endif()
 list(APPEND PROJECT_LIBS ui_shared)
-
+        
 set(QT_SOURCES
 	BootableModel.cpp
 	BootableModel.h
@@ -129,6 +129,8 @@ set(QT_SOURCES
 	ElidedLabel.h
 	GSH_OpenGLQt.cpp
 	GSH_OpenGLQt.h
+	GSH_SoftwareQt.cpp
+	GSH_SoftwareQt.h
 	InputProviderQtKey.cpp
 	InputProviderQtKey.h
 	InputProviderQtMouse.cpp
@@ -148,6 +150,8 @@ set(QT_SOURCES
 	QStringUtils.h
 	QtUtils.cpp
 	QtUtils.h
+	softwarewindow.cpp
+	softwarewindow.h
 	vfsmanagerdialog.cpp
 	vfsmanagerdialog.h
 	vfsmodel.cpp
@@ -237,6 +241,7 @@ set(QT_MOC_HEADERS
 	ElidedLabel.h
 	settingsdialog.h
 	openglwindow.h
+    softwarewindow.h
 	outputwindow.h
 	QBootablesView.h
 	memorycardmanagerdialog.h
@@ -245,7 +250,7 @@ set(QT_MOC_HEADERS
 	vfsdiscselectordialog.h
 	${AMAZON_S3_QT_MOC}
 	${GSH_VULKAN_QT_MOC}
-    ${GSH_METAL_QT_MOC}
+	${GSH_METAL_QT_MOC}
 )
 
 set(QT_UIS

@@ -31,6 +31,7 @@ SettingsDialog::SettingsDialog(QWidget* parent)
 	ui->comboBox_vulkan_device->blockSignals(true);
 
 	ui->comboBox_gs_selection->insertItem(SettingsDialog::GS_HANDLERS::OPENGL, "OpenGL");
+    ui->comboBox_gs_selection->insertItem(SettingsDialog::GS_HANDLERS::SOFTWARE, "Software");
 #ifdef HAS_GSH_METAL
     ui->comboBox_gs_selection->insertItem(SettingsDialog::GS_HANDLERS::METAL, "Metal");
 #endif
