@@ -126,11 +126,11 @@ void CGSH_Metal::MarkNewFrame()
 	CGSHandler::MarkNewFrame();
 }
 
-void CGSH_Metal::FlipImpl()
+void CGSH_Metal::FlipImpl(const DISPLAY_INFO& dispInfo)
 {
     FlushVertexBuffer();
     
-	CGSHandler::FlipImpl();
+	CGSHandler::FlipImpl(dispInfo);
 }
 
 void CGSH_Metal::FlushVertexBuffer()
