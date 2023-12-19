@@ -7,6 +7,18 @@
 	</Executable>
 	<Executable Name="SCES_500.03;1" Title="Dead or Alive 2" Region="EU">
 		<Patch Address="0x002b4c44" Value="0x24060000" Description="Make the file reading RPC call synchronous. Requires proper data cache handling to avoid issue." />
+		<Patch Address="0x002b8884" Value="0x00000000" Description="Enable printf" />
+		<Patch Address="0x002b888C" Value="0x00000000" Description="Enable printf" />
+		<Patch Address="0x002b8890" Value="0x00000000" Description="Enable printf" />
+		<Patch Address="0x002b889C" Value="0x00000000" Description="Enable printf" />
+		<Patch Address="0x0061e190" Value="0x00000001" Description="Enable libcdvd logging." />
+
+		<!-- j printf -->
+		<Patch Address="0x003a6780" Value="0x080ec022" Description="enable error logging." />
+		<Patch Address="0x003a6784" Value="0x00000000" Description="enable error logging." />
+
+		<Patch Address="0x0065dcf4" Value="0x00000000" Description="enable screen debug." />
+		<Patch Address="0x002b8984" Value="0x00000000" Description="enable screen debug." />
 	</Executable>
 	<Executable Name="SLPS_250.02;1" Title="Dead or Alive 2">
 		<Patch Address="0x00290408" Value="0x24060000" Description="Make the file reading RPC call synchronous. Requires proper data cache handling to avoid issue." />

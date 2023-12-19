@@ -1058,12 +1058,18 @@ uint32 CIopBios::CreateThread(uint32 threadProc, uint32 priority, uint32 stackSi
 	//Thread proc address needs to be 4-bytes aligned
 	if((threadProc & 0x3) != 0)
 	{
+#ifdef _DEBUG
+    CLog::GetInstance().Print(LOGNAME, "    -> KERNEL_RESULT_ERROR_ILLEGAL_ENTRY\r\n");
+#endif
 		return KERNEL_RESULT_ERROR_ILLEGAL_ENTRY;
 	}
 
 	//Priority needs to be between [1, 126]
 	if((priority < 1) || (priority > 126))
 	{
+#ifdef _DEBUG
+        CLog::GetInstance().Print(LOGNAME, "    -> KERNEL_RESULT_ERROR_ILLEGAL_PRIORITY\r\n");
+#endif
 		return KERNEL_RESULT_ERROR_ILLEGAL_PRIORITY;
 	}
 
@@ -1106,6 +1112,9 @@ uint32 CIopBios::CreateThread(uint32 threadProc, uint32 priority, uint32 stackSi
 	thread->wakeupCount = 0;
 	thread->context.gpr[CMIPS::GP] = m_cpu.m_State.nGPR[CMIPS::GP].nV0;
 	thread->context.gpr[CMIPS::SP] = thread->stackBase + thread->stackSize - STACK_FRAME_RESERVE_SIZE;
+#ifdef _DEBUG
+    CLog::GetInstance().Print(LOGNAME, "    -> created thead with ID = %d\r\n", thread->id);
+#endif
 	return thread->id;
 }
 
@@ -1501,6 +1510,12 @@ int32 CIopBios::SleepThread()
 #endif
 
 	THREAD* thread = GetThread(m_currentThreadId);
+    
+#ifdef _DEBUG
+    CLog::GetInstance().Print(LOGNAME, "    called from 0x%x, wakeupCount = %d;\r\n",
+                              thread->context.epc, thread->wakeupCount);
+#endif
+    
 	if(thread->status != THREAD_STATUS_RUNNING)
 	{
 		throw std::runtime_error("Thread isn't running.");
@@ -1834,14 +1849,23 @@ void CIopBios::UnlinkThread(uint32 threadId)
 
 void CIopBios::Reschedule()
 {
+#ifdef _DEBUG
+    CLog::GetInstance().Print(LOGNAME, "Reschedule, current thread Id = %d.\r\n", m_currentThreadId.Get());
+#endif
 	if((m_cpu.m_State.nCOP0[CCOP_SCU::STATUS] & CMIPS::STATUS_EXL) != 0)
 	{
+#ifdef _DEBUG
+        CLog::GetInstance().Print(LOGNAME, "     EXL status set, ignoring.\r\n");
+#endif
 		return;
 	}
 
 	//Don't switch if interrupts are disabled
 	if((m_cpu.m_State.nCOP0[CCOP_SCU::STATUS] & CMIPS::STATUS_IE) != CMIPS::STATUS_IE)
 	{
+#ifdef _DEBUG
+        CLog::GetInstance().Print(LOGNAME, "    Interrupts disabled, ignoring.\r\n");
+#endif
 		return;
 	}
 
@@ -1863,7 +1887,9 @@ void CIopBios::Reschedule()
 	if(nextThreadId != m_currentThreadId)
 	{
 		CLog::GetInstance().Print(LOGNAME, "Switched over to thread %i.\r\n", nextThreadId);
-	}
+    } else {
+        CLog::GetInstance().Print(LOGNAME, "Reschedule keeping thread %i.\r\n", nextThreadId);
+    }
 #endif
 	m_currentThreadId = nextThreadId;
 }
